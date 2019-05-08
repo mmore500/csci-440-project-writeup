@@ -1,0 +1,129 @@
+The digital experimental framework used to investigate the relationship between plasticity and evolvability can be discussed in terms of three major components that compose it: the gene regulatory network model employed to perform the genotype-phenotype mapping, the criteria employed to assess phenotypic fitness, and the evolutionary algorithm employed to select on, mutate, and recombine genetic information.
+These components will be described in Sections \ref{sec:grn}, \ref{sec:fitness}, and \ref{sec:ea}, respectively.
+Then, a sketch of the approaches used to realize the digital experimental framework will be described in \ref{sec:implementation}.
+
+\subsection{Gene Regulatory Network Model} \label{sec:grn}
+The gene regulatory network model employed in this investigation was inspired by the approach reported in \cite{Wilder2015ReconcilingEvolvability} that was originally developed in \cite{Draghi2009TheModel}.
+In this model employed by Wilder et al., the genotype is a directed graph with $k$ vertices where $k$ is the number of chemical products considered in the model.
+Each node in the directed graph represents a single chemical product.
+Experiments in \cite{Wilder2015ReconcilingEvolvability} used $k = 10$.
+Connections between nodes represent gene rules.
+Edge weights may only take on the values -1, 1, and 0.
+Respectively, these edge weight values represent a inhibitory, excitatory, and neutral relationship between the source chemical product node and the destination chemical product node.
+Thus, the genome may be represented by a $k \times k$ matrix $W$ where $W_{ij}$ represents the edge weight between transcriptional regulators $i$ and $j$.
+
+An individual's phenotype is the pattern of chemical product concentrations induced by the action of gene rules on an initial state $S(0)$.
+In this model, chemical concentrations are modeled as simple on/off states.
+Thus, the set of chemical concentrations in the model at time step $n$, $S(n)$, can be represented as a simple bit vector.
+To generate the phenotype, The following update rule is iteratively applied 500 times:
+\begin{align*}
+S_i(t+1) = 
+\begin{cases}
+1 & \text{if } \sum_{j=1}^{k} W_{ji}S_j(t) > 0 \\
+0 & \text{otherwise.}
+\end{cases}
+\end{align*}
+An individual is deemed viable if a fixed point is reached after 500 iterations (i.e. $S(500) = S(501)$).
+If no fixed point is reached, the individual is deemed inviable and receives a fitness score smaller than those that would be assigned to all possible viable individuals.
+Fitness scoring procedures are provided in detail in Section \ref{sec:fitness}.
+
+Several adjustments were made to the model employed in \cite{Wilder2015ReconcilingEvolvability}.
+Firstly, it was desired to work with a larger set of chemical concentrations, $k=98$,  than was employed in \cite{Wilder2015ReconcilingEvolvability}.
+To avoid the $O(k^2)$ inflation of information stored in the genome, an alternate scheme was employed to represent the set of gene rules.
+The set of gene rules was implemented as a set $\mathcal{S}$ of 392 individual if-then rules.
+Each gene rule represents the action of one chemical product, the antecedent, on another, the patient.
+As depicted in Figure \inputandref{grn_list}, the rule $R$ has three components: the index of a chemical antecedent $i$ denoted $R_a$, the index of a chemical patient $j$ denoted $R_p$, and a value $R_r$ describing the action of the antecedent on the patient.
+As before, $R_r$ may take on the values -1, 1, and 0 to represent inhibitory, excitatory, and neutral relationships, respectively.
+Thus, under this scheme each chemical concentration is updated according to the concentrations of the chemical products at the following timestep as follows:
+\begin{align*}
+S_i(t+1) = 
+\begin{cases}
+1 & \text{if } \sum_{R \in \mathcal{R}_i} R_r \times S_R(t) > 0 \\
+0 & \text{otherwise.}
+\end{cases}
+\end{align*}
+where $S_R(t) = S_j(t)$ with $j = R_a$ and $\mathcal{R}_i = \Set{R}{R \in \mathcal{S} \text{ and } R_p = i}$.
+As before, to generate the phenotype this update rule is applied 500 times to an initial state $S(0)$ to generate the final state $S(500)$ and an individual is deemed inviable if $S(500) \neq S(501)$.
+To enable sophisticated regulatory interactions in the network, it was desired to hide a portion of the chemical products from direct exposure in the phenotype.
+Thus, the phenotype is defined as a subset of the set of chemical states $S(500)$.
+In this case, the phenotype was defined as the end state of chemical products with indices 1 through 49, amounting to half of the chemical products acted on by the gene rules.
+
+The experimental conditions of indirect and direct plasticity were realized by altering the initial set of chemical concentrations the gene regulatory network acts on (i.e. $S(0)$).
+For each experiment, a set of chemical concentrations was generated at random with each initial chemical concentration having an equal probability of being set in the on or off state.
+In control experiments, this set of chemical concentrations was employed directly as $S(0)$, remaining absolutely constant throughout each evolutionary run.
+The control scheme is depicted in Figure \ref{fig:control_scheme}.
+In direct plasticity experiments, a set of chemical concentrations is similarly generated.
+However, at the outset of each individual development process, random changes are made to this initial set of chemical concentrations to form $S(0)$ for that individual development process. 
+With probability $P$, each chemical concentration is randomly reassigned with equal probability to the on or off state.
+The parameter $P$, which may range between 0 and 1, thus controls the severity with which environmental noise affects the developmental process.
+The value $P = 0.2$ was used.
+As in \cite{Reisinger2005TowardsEvolvability}, individual fitness was determined as the mean fitness score of several developmental runs.
+In this case, 10 repeat evaluations were performed.
+This direct plasticity scheme is depicted in Figure \ref{fig:direct_plasticity_scheme}.
+
+In the indirect plasticity scheme, a distinct pair of sets of chemical concentrations are generated as in the control scheme.
+A distinct pair of fitness criteria are also generated as discussed in Section \ref{sec:fitness}.
+One fitness criteria, termed the primary objective, is paired with one set of chemical concentrations and the second fitness criteria, termed the secondary objective, is paired with the other set of chemical concentrations.
+In this scheme, the development process performed twice, with $S(0)$ seeded once by each set of chemical concentrations. 
+The phenotypes generated are evaluated according to the fitness criteria corresponding to the set of chemical concentrations used as $S(0)$.
+Individual fitness is assessed as the mean fitness, weighted by a parameter $W$ representing the proportion of fitness determined by performance under the secondary environmental condition/objective pair.
+The value $W = 0.2$ was used.
+This indirect plasticity scheme is depicted in Figure \ref{fig:indirect_plasticity_scheme}. 
+
+Finally, combined indirect and direct plasticity was realized by combining indirect and direct treatments of $S(0)$.
+A weighted set of two environmental condition/objective pairings exposed to random perturbation of the initial state was employed.
+The parameters $W = 0.33$ and $P = 0.2$ were used.
+Five repeat evaluations were performed for each baseline initial condition evaluated.
+The combined indirect and direct plasticity scheme is depicted in Figure \ref{fig:combined_plasticity_scheme}.
+
+\subsection{Fitness criteria} \label{sec:fitness}
+To study evolvability, it is desirable to avoid a direct correspondence between phenotypic distance and fitness.
+Put more directly, it is desirable to work with fitness criteria where small phenotypic changes may on occasion result in significant fitness consequences and large phenotypic changes may on occasion result in slight fitness consequences.
+Fitness consequence and magnitude of phenotypic change are necessarily correlated to some extent, but in a scheme without direct correspondence between these values, the effect of mutation in terms of the two major dimensions of evolvability, the generation of phenotypic novelty and phenotypic viability under mutation, can be teased apart to some degree \cite{Tarapore2015EvolvabilityBenchmarks}.
+Thus, in the context of this research it was desired to avoid determining fitness via the hamming distance $d$ between an individual's gene expression profile and a target profile as was performed in \cite{Wilder2015ReconcilingEvolvability}.
+
+Instead, fitness was measured by taking the phenotype as the initial state of a cellular automata simulation.
+The fitness score is defined as the value of certain metric assessed from the set of states generated by the cellular automata simulation  (discussed below).
+It was determined that such a scheme would provide the desired indirect relationship between fitness consequence and magnitude of phenotypic effect of mutation.
+In this case, the set of cellular automata rules known as Conway's game of life was employed \cite{Conway1970TheLife}.
+The phenotype generated via the gene regulatory network, a set of on/off states, were arranged into a two dimensional grid.
+In this case, the grid had dimensions $7 \times 7$.
+The series of grid states $G = \{g_1, g_2, g_3 \ldots g_30\}$ resulting from 30 sequential applications of Conway's game of life rules were recorded.
+A cutoff parameter $1 < C < 30$ defines a particular fitness criteria.
+Fitness is assessed from the ratios of live cells (grid tiles in the active state) to dead cells (grid tiles in the inactive state) observed in the grid states preceding and following the cutoff time coordinate.
+Fitness is thus calculated as,
+\begin{align*}
+\frac{\sum_{i=1}^{n<C} L(g_i)}{C} - \frac{\sum_{i=C}^{n<30} L(g_i)}{30 - C}
+\end{align*}
+where $L(g)$ represents a count of the live cells present in Conway grid state $g$.
+Under this scheme, a phenotype from which a high density of live cells is observed prior to the cutoff time coordinate and a low density of live cells is observed following the cutoff time coordinate will enjoy high fitness.
+Note that the fitness is normalized to fall strictly in the range $[-1, 1]$.
+Thus, with a fitness value of $-1$ assigned to non-convergent individuals, convergent individuals will enjoy a selective advantage against non-convergent individuals.
+The ability to readily define alternate fitness criteria is essential to this research (i.e. to experimentally realize indirect plasticity).
+Adjustment of the cutoff parameter $C$ provides an avenue to this end.
+
+\subsection{Evolutionary Algorithm} \label{sec:ea}
+Selection, mutation, and recombination of genetic material was performed with the Distributed Evolutionary Algorithms in Python (DEAP) framework \cite{Fortin2012DEAP:Easy}.
+A population size of 50 individuals was employed.
+At the outset of each generation, each available space in the population was filled by tournament-style selection of the most fit individual among a randomly selected group of five individuals.
+This procedure was performed using DEAP's \texttt{selTournament} tool.
+Exchange of genetic material via two-point crossover was then performed among members of the new generation with DEAP's \texttt{cxTwoPoint} tool with crossover between each pairing occurring with probability 0.5.
+Finally, with probability 0.2, mutation was applied to each member of the new generation.
+If an individual was selected for mutation, the number of point mutations the individual experienced was drawn from a binomial distribution with $n=392$, the number of rules present in the genome, and $p=0.1$.
+For each point mutation, a rule was selected at random from the set of 392 rules that compose the genome.
+Mutation was performed by selecting a random rule from an individual's genome, selecting a component of the rule at random with equal probability (i.e. $R_a$, $R_r$, or $R_p$), and reassigning the rule component to a selection drawn with equal probability from the set of valid values for that component.
+
+\subsection{Implementation} \label{sec:implementation}
+The digital experiments performed required significant computational power, especially in light of the replicate trials necessary to establish statistical significance.
+Fortunately, evolutionary algorithms are amenable to massive parallelization.
+Fitness evaluations of individuals in a population can be readily performed in parallel.
+In order to exploit parallel processing power, experiments were performed on remote clusters.
+Even with this parallel processing power, performing replicate experiments required the better part of a day. 
+The software with which simulations were performed was structured as a Python package.
+This software package was written and tested on a local machine, then installed on a remote cluster.
+This development scheme, which strictly separated code implementing the model from code written to perform experiments with the model, allowed the model to be kept under strict version control.
+Computational tests were performed and recorded using Jupyter notebooks hosted on the remote cluster.
+These notebooks provided a convenient mechanism to catalog and annotate code written to perform experiments and results from those experiments, both in the form of printed console output and graphical output generated via Pyplot.
+Data from computational experiments was saved on the remote clusters using the Pickle Object Serialization tool.
+Jupyter notebooks, which are served as HTML documents, are readily accessible from a local machine.
+

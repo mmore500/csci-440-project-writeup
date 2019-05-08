@@ -1,0 +1,25 @@
+Experiments reported in Section ref{sec:results} confirm that environmental influence on the phenotype affects the outcomes of mutation of champion individuals.
+These experiments therefore evidence a relationship between phenotypic plasticity and evolvability.
+This finding opens questions about the exact nature of this relationship and, in particular, how the relationship mechanistically operates.
+
+Evolvability is commonly understood in terms of internal structural configuration of an evolving system.
+Work performed by Draghi and Wagner investigating evolvability in a highly abstract, simplified evolutionary model illustrates the connection between internal structural configuration and evolvability \cite{Draghi2008EVOLUTIONMODEL}.
+The phenotype in their model is a coordinate in two-dimensional space. 
+Genotypically, individuals are represented as a pair of vectors.
+Individuals for which a near right angle exists between their pair of genotypic vectors are considered more evolvable compared to individuals for which these two vectors are near parallel.
+The near-perpendicular internal configuration allows for a greater range of phenotypic outcomes (i.e. points in two-dimensional space) to be realized by mutations that affect vector length.
+
+Consideration of how internal structural characteristics might bridge the gap between environmental influence on the phenotype and evolvabilitiy can be brought explicitly into terms of the gene regulatory network model explored in this paper.
+It is hypothesized that environmental noise induced selection for internal structural configurations capable of mitigating that noise which, in turn, caused an increase in the frequency of silent mutation.
+The presence of alternate phenotypic targets in the context of multiple condition/objective pairings is hypothesized to have induced selection for internal structural configurations capable of facilitating developmental path switching which, in turn, caused a decrease in the frequency of silent mutation.
+The exact nature of these internal structural configurations remains an open question.
+The internal configuration of individuals --- the gene regulatory network rules through which the phenotype is generated --- can be represented as a directed graph.
+Preliminary analysis of various graph metrics --- the overall occurrence of different types of connections (i.e. inhibitory, excitatory, and neutral) between nodes, the distribution of connection counts between each node, the number of isolated subgraphs present etc. --- did not reveal any obvious differences in the graph structures characteristic of champions evolved under different experimental regimes.
+A more comprehensive effort to characterize the graph structure of champions evolved under different experimental regimes, in particular to visualize the gene regulatory graphs of individual champion solutions as well as the aggregate structural characteristics of a set of champion solutions evolved under the same experimental regime, might shed light on internal structural configurations that promote direct plasticity and indirect plasticity.
+
+A key question to address is how the internal structural configurations that promote direct and indirect plasticity relate to one another.
+Direct and indirect plasticity may stem from vastly different aspects of internal structural configuration, identical aspects of internal structure configuration (likely in opposite polarities), or some intermediate between the two.
+The frequency of mutational outcomes, reported in Figure \ref{fig:mutation_type_combined}, shed some light on this question.
+Simultaneous selection for direct and indirect plasticity does not seem to result in a simple ``canceling out'' of the evolvability characteristics exhibited by champion individuals selected for direct and indirect plasticity in isolation.
+Instead, there is an increase of the rate at which phenotypically-expressed non-lethal mutation is observed while the rate of silent mutation is not strongly affected.
+This result may suggest that direct and indirect plasticity stem from different aspects of internal structural configuration. 

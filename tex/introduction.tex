@@ -1,0 +1,36 @@
+Evolvability is a principal concern to Evolutionary Algorithm researchers and evolutionary biologists alike. Although many competing definitions of evolvability exist in the literature, the general consensus is that evolvability stems from traits that facilitate the generation of viable heritable phenotypic variation \cite{Tarapore2015EvolvabilityBenchmarks}\footnote{This statement does not suggest that mutation is nonrandom, a controversial and widely discredited theory referred to biologists as adaptive mutation. Instead, it is predicated on the notion that the internal configuration of a biological system (i.e. the developmental process, modularity, degeneracy, etc.) constrains the outcomes of arbitrary perturbations to that system. It is hypothesized that biological organisms possess traits that influence the distribution of phenotypic effects of random mutation.} Breaking the concept down, evolvability stems from:
+\begin{enumerate}
+\item the amount of novel, heritable phenotypic variation among offspring, and
+\item the degree to which heritable phenotypic variation among offspring is viable,\footnote{This can be thought of in terms of the frequency at which lethal or otherwise severely harmful mutational outcomes are observed.}
+\end{enumerate}
+The dependence of evolution on these capacities is straightforward. Without any heritable variation, evolution would have no raw material to select from and would stagnate. Without any viable variation, evolution would select against all novelty and again stagnate. Hence, systematic evolutionary change depends on the production of heritable, novel phenotypic variation, some of which must not be severely deleterious. We have established plausible traits that might facilitate evolution, but several important questions remain unanswered. How does evolvability manifest in biological organisms (i.e. what traits of biological organisms provide proximate explanations for the presence of viable heritable variation among offspring)? Why does evolvability manifest (i.e. what ultimate mechanistic forces endow biological organisms with traits that promote evolvability)? Addressing these two questions gives us a shot at tackling a third: how can evolvability be promoted in evolutionary algorithms?
+
+It seems likely that evolvability stems from a large and diffuse set of contributing factors. The establishment -- or rejection -- of empirical causal links between theoretical complications of evolution and evolvability is a key research goal in the field; this type of inquiry will determine the complexity of a model necessary to account for evolution as observed in biological history and how complicated of a model is necessary to realize digital evolving systems with performance akin to their biological counterparts.
+
+To this end, this research aims to investigate the relationship between environmental influence on the phenotype and evolvability.
+It is hypothesized that organisms evolved under different regimes of environmental influence on the phenotype will exhibit different phenotypic responses to mutation.
+To test this hypothesis, a series of digital experiments was performed with a genetic regulatory network model.
+The gene regulatory network model is analogous to the transcription process of a biological cell.
+In the model, a set of gene rules acts on a set of chemical concentrations, causing them to change over time.
+The gene rules are influenced by the set of chemical concentrations they act on.
+Rules may be activated and deactivated by the absence or presence of a chemical compound.
+In the gene regulatory network model, the gene rules are said to represent the genotype.
+Through the interpretation of the gene rules over simulated time, a phenotype --- the end set of chemical concentrations --- is developed.
+In the context of the evolutionary process, the phenotype is evaluated to determine the fitness of a gene regulatory network.
+The particular gene regulatory network model employed in this study was inspired by the model employed in \cite{Wilder2015ReconcilingEvolvability}.
+This model was originally developed in \cite{Draghi2009TheModel}.
+
+Gene regulatory networks were evolved under four regimes:
+\begin{enumerate}
+\item direct plasticity, where stochastic noise was introduced into the development process (Figure \inputandref{direct_plasticity_scheme}),
+\item indirect plasticity, in which alternate environmental conditions indicate which of several alternate criteria phenotypes will be evaluated against (Figure \inputandref{indirect_plasticity_scheme}),
+\item combined indirect-direct plasticity (Figure \inputandref{combined_plasticity_scheme}), and
+\item control conditions (Figure \inputandref{control_scheme}).
+\end{enumerate}
+To assess the impact of these experimental conditions on evolvability, the response to mutation of champion individuals from populations evolved under each experimental condition was assessed.
+Specifically, the frequency of three mutational outcomes was assessed:
+\begin{enumerate}
+\item silent mutation (mutation which is not phenotypically expressed),
+\item lethal mutation (mutation which leads to a failure to develop a phenotype; in terms of the gene regulatory network model, this refers to mutations which cause the set of chemical concentrations to fail to converge after 500 applications of the set of gene rules),
+\item non-lethal phenotypically expressed mutation (non-lethal mutation which leads to observable phenotypic effects).
+\end{enumerate}
